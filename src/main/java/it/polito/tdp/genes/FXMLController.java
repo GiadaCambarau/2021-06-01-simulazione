@@ -5,8 +5,11 @@
 package it.polito.tdp.genes;
 
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.genes.model.Arco;
 import it.polito.tdp.genes.model.Genes;
 import it.polito.tdp.genes.model.Model;
 import javafx.event.ActionEvent;
@@ -30,7 +33,7 @@ public class FXMLController {
     private Button btnCreaGrafo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbGeni"
-    private ComboBox<?> cmbGeni; // Value injected by FXMLLoader
+    private ComboBox<Genes> cmbGeni; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnGeniAdiacenti"
     private Button btnGeniAdiacenti; // Value injected by FXMLLoader
@@ -46,19 +49,44 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-    	
+    	model.creaGrafo();
+    	txtResult.appendText("Vertici: "+ model.getV()+"\n");
+    	txtResult.appendText("Archi: "+ model.getA()+"\n");
+    	cmbGeni.getItems().addAll(model.fetVertici());
 
     }
 
     @FXML
     void doGeniAdiacenti(ActionEvent event) {
-
+    	if (cmbGeni.getValue() != null) {
+    		Genes g = cmbGeni.getValue();
+    		List<Arco> lista= model.getAdj(g);
+    		txtResult.appendText("I geni adiacenti a: "+g.getGeneId()+ "\n");
+    		for (Arco a : lista) {
+    			txtResult.appendText(a.getG2()+"   "+ a.getPeso()+"\n");
+    			
+    		}
+    	}
     	
     }
 
     @FXML
     void doSimula(ActionEvent event) {
-
+    	if (cmbGeni.getValue() != null) {
+    		Genes partenza = cmbGeni.getValue();
+    		if (txtIng.getText().compareTo("")!=0) {
+    			try {
+    				txtResult.appendText("Fine simulazione: "+"\n");
+    				int n =Integer.parseInt(txtIng.getText());
+    				Map<Genes,Integer> mappa = model.simula(n, partenza);
+    				for (Genes g: mappa.keySet()) {
+    					txtResult.appendText(g.getGeneId()+ "   "+ mappa.get(g)+"\n");
+    				}
+    			}catch(NumberFormatException e) {
+    				
+    			}
+    		}
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
